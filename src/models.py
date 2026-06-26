@@ -11,6 +11,13 @@ from scipy.special import expit
 from scipy.stats import chi2, norm
 from sklearn.preprocessing import StandardScaler
 from statsmodels.tsa.stattools import adfuller
+from scipy.stats import chi2_contingency
+from sklearn.cluster import AgglomerativeClustering, KMeans
+from sklearn.metrics import (
+    adjusted_rand_score,
+    normalized_mutual_info_score,
+    silhouette_score,
+)
 
 warnings.filterwarnings("ignore")
 
@@ -749,8 +756,7 @@ class ClusteringBenchmark:
 
         if ari_km < 0.6:
             print(
-                "\n→ ECONOMETRIC INSIGHT: L'ARI basso dimostra che la dipendenza "
-                "Markoviana dell'HMM conta."
+                "\n→ ECONOMETRIC INSIGHT: The low ARI shows that the Markov dependence of the HMM matters."
             )
 
         self.best_k = best_k
@@ -786,9 +792,7 @@ class ClusteringBenchmark:
         print("Contingency Table:\n", contingency_table)
         print(f"\nPearson Chi-Square: Chi2 = {chi2_stat:.2f} | P-value = {p_val:.4e}")
         conclusion = (
-            "REJECT H0: Validazione confermata ✓"
-            if p_val < 0.05
-            else "FAIL TO REJECT H0: Nessuna coincidenza sistematica."
+            "REJECT H0 at level 5%" if p_val < 0.05 else "FAIL TO REJECT H0 at level 5%"
         )
         print(f"\n→ {conclusion}")
 
@@ -796,7 +800,6 @@ class ClusteringBenchmark:
         return chi2_stat, p_val
 
     def _plot_results(self):
-        print("\nGenerazione del grafico di confronto a 3 pannelli...")
 
         master_hmm = self.master_hmm.copy()
         master_hmm["kmeans_cluster"] = self.kmeans_labels
